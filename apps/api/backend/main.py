@@ -1,10 +1,8 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from backend.api.admin_routes import router as admin_router
 from backend.api.auth_routes import router as auth_router
@@ -19,8 +17,6 @@ from backend.core.logger import configure_logging, get_logger
 from backend.core.tokens import get_key_set
 
 logger = get_logger(__name__)
-
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
 
 @asynccontextmanager
@@ -90,9 +86,4 @@ def create_app() -> FastAPI:
     app.include_router(admin_router)
     app.include_router(content_router)
     install_openapi(app)
-
-    # Frontend de demonstração: montado APENAS em ambiente de desenvolvimento ou teste.
-    # Em produção, a responsabilidade é 100% da aplicação Next.js (apps/web).
-    if settings.ENVIRONMENT != Environment.PRODUCTION and FRONTEND_DIR.is_dir():
-        app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
     return app

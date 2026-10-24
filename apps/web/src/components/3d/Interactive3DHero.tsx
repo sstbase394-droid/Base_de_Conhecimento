@@ -27,8 +27,16 @@ export function Interactive3DHero({ className = '' }: Interactive3DHeroProps) {
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    // Checagem de preferência de movimento reduzido
+    // Melhoria Progressiva e Regra dos 3 Segundos:
+    // Em telas pequenas (< 768px, mobile) ou com preferência de movimento reduzido / saveData,
+    // não inicializa o contexto WebGL pesado para economizar bateria, dados e manter TTI abaixo de 2s.
+    const isMobile = window.innerWidth < 768;
+    const isSaveData = (navigator as unknown as { connection?: { saveData?: boolean } }).connection?.saveData;
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (isMobile || isSaveData) {
+      return;
+    }
 
     // Configuração de Cena, Câmera e Renderer Three.js
     const scene = new THREE.Scene();
@@ -237,7 +245,13 @@ export function Interactive3DHero({ className = '' }: Interactive3DHeroProps) {
       className={`relative w-full h-full flex items-center justify-center overflow-hidden pointer-events-none select-none ${className}`}
       aria-hidden="true"
     >
-      <canvas ref={canvasRef} className="w-full h-full block" />
+      <canvas ref={canvasRef} className="hidden md:block w-full h-full" />
+      {/* Fallback Estático Elegante e Ultra-leve para Mobile / SaveData */}
+      <div className="md:hidden flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 rounded-full border border-border bg-border/20 flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-full border border-[color:var(--mesh-1)]/40 animate-pulse" />
+        </div>
+      </div>
     </div>
   );
 }

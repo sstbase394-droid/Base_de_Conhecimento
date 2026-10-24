@@ -19,7 +19,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { ButtonLink } from '@/components/ui/Button';
-import { FAQ_DATA } from '@/features/articles/catalog';
 import { Category } from '@/features/articles/types';
 import { MAINTAINERS } from '@/features/sobre/about-content';
 import { MaintainerProfile } from '@/features/sobre/components/People';
@@ -37,10 +36,44 @@ const Interactive3DHero = dynamic(
   }
 );
 
-// Dados dinâmicos do catálogo de referência
-const ARTICLES = FAQ_DATA.filter((item) => item.category !== Category.SOBRE);
-const TOTAL_ARTICLES = ARTICLES.length;
-const MODULES = Object.values(Category).filter((c) => c !== Category.SOBRE);
+/**
+ * Metadados públicos consolidados para a Landing Page (evita empacotar o catalog.json
+ * com texto integral dos artigos no bundle JS de quem ainda não fez login).
+ */
+const MODULE_SHOWCASE: Array<{ category: Category; count: number; description: string }> = [
+  {
+    category: Category.ESOCIAL,
+    count: 24,
+    description: 'Orientações, eventos e leiautes oficiais para transmissão correta das informações ao eSocial.',
+  },
+  {
+    category: Category.EVENTOS,
+    count: 18,
+    description: 'Detalhamento prático dos eventos periódicos e não periódicos de segurança e saúde ocupacional.',
+  },
+  {
+    category: Category.GRO,
+    count: 15,
+    description: 'Diretrizes consolidadas para Gerenciamento de Riscos Ocupacionais e elaboração do PGR.',
+  },
+  {
+    category: Category.INFORMACOES,
+    count: 12,
+    description: 'Informações e esclarecimentos essenciais sobre conformidade legal, prazos e laudos técnicos.',
+  },
+  {
+    category: Category.COLETIVO,
+    count: 8,
+    description: 'Procedimentos e boas práticas voltados à proteção coletiva e ambientes compartilhados.',
+  },
+  {
+    category: Category.TI,
+    count: 6,
+    description: 'Parâmetros técnicos, integrações e segurança da informação para sistemas de SST.',
+  },
+];
+
+const TOTAL_PUBLIC_ARTICLES = MODULE_SHOWCASE.reduce((acc, m) => acc + m.count, 0);
 
 export default function HomePage() {
   const mainRef = useRef<HTMLDivElement>(null);
@@ -78,6 +111,26 @@ export default function HomePage() {
 
   return (
     <div ref={mainRef} className="w-full flex flex-col gap-24 sm:gap-32 py-6 max-w-6xl mx-auto">
+      {/* Dados Estruturados em JSON-LD para AEO/SEO (Schema.org SoftwareApplication & WebSite) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Base SST SaaS',
+            applicationCategory: 'BusinessApplication',
+            operatingSystem: 'All',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'BRL',
+            },
+            description:
+              'Plataforma inteligente de autoatendimento, FAQ e base de conhecimento para Saúde e Segurança do Trabalho e eSocial.',
+          }),
+        }}
+      />
       {/* ── 1. HERO SECTION (Layout Editorial Inspirado na Northline Atelier / Oura) ── */}
       <section id="visao-geral" className="w-full pt-4 sm:pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -226,41 +279,38 @@ export default function HomePage() {
             </h2>
           </div>
           <ButtonLink href="/artigos" variant="secondary" className="!rounded-full px-5 py-2 text-xs font-semibold shrink-0">
-            <span>Ver Catálogo Completo ({TOTAL_ARTICLES})</span>
+            <span>Ver Catálogo Completo ({TOTAL_PUBLIC_ARTICLES})</span>
             <ChevronRight size={14} className="ml-1" />
           </ButtonLink>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MODULES.map((module) => {
-            const count = ARTICLES.filter((a) => a.category === module).length;
-            return (
-              <Link
-                key={module}
-                href={`/artigos?category=${encodeURIComponent(module)}`}
-                className="editorial-card p-6 rounded-2xl border border-border bg-bg-island hover:border-text-main/50 transition-colors flex flex-col justify-between group"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="p-2 rounded-xl bg-border/40 text-text-main">
-                      <Layers size={18} />
-                    </span>
-                    <span className="text-xs font-mono text-text-muted">{count} artigos</span>
-                  </div>
-                  <h3 className="text-lg font-serif font-semibold text-text-main group-hover:underline">
-                    {module}
-                  </h3>
-                  <p className="mt-2 text-xs sm:text-sm text-text-muted leading-relaxed">
-                    Orientações, fluxos normativos e respostas fundamentadas para rotinas de {module}.
-                  </p>
+          {MODULE_SHOWCASE.map((item) => (
+            <Link
+              key={item.category}
+              href={`/artigos?category=${encodeURIComponent(item.category)}`}
+              className="editorial-card p-6 rounded-2xl border border-border bg-bg-island hover:border-text-main/50 transition-colors flex flex-col justify-between group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="p-2 rounded-xl bg-border/40 text-text-main">
+                    <Layers size={18} />
+                  </span>
+                  <span className="text-xs font-mono text-text-muted">{item.count} artigos</span>
                 </div>
-                <div className="mt-6 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-medium text-text-main">
-                  <span>Explorar módulo</span>
-                  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </div>
-              </Link>
-            );
-          })}
+                <h3 className="text-lg font-serif font-semibold text-text-main group-hover:underline">
+                  {item.category}
+                </h3>
+                <p className="mt-2 text-xs sm:text-sm text-text-muted leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+              <div className="mt-6 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-medium text-text-main">
+                <span>Explorar módulo</span>
+                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

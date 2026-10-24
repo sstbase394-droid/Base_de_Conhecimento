@@ -15,8 +15,11 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    // Se o usuário preferir movimento reduzido, não inicializa o Lenis
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Se o usuário preferir movimento reduzido ou estiver em dispositivo touch/mobile, não inicializa o Lenis
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+
+    if (prefersReducedMotion || isTouchDevice) {
       return;
     }
 

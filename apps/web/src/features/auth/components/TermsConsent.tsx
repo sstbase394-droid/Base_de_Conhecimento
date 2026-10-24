@@ -23,7 +23,10 @@ export function TermsConsent({
   const errorId = `${id}-error`;
   return (
     <div className="space-y-1">
-      <div className="flex items-start gap-3">
+      <label
+        htmlFor={id}
+        className="flex items-start gap-3 p-2 -m-2 rounded-xl hover:bg-border/20 transition-colors cursor-pointer select-none"
+      >
         <input
           id={id}
           ref={inputRef}
@@ -35,15 +38,13 @@ export function TermsConsent({
           aria-describedby={error ? errorId : undefined}
           className="mt-0.5 h-5 w-5 shrink-0 cursor-pointer accent-current text-text-main"
         />
-        <label
-          htmlFor={id}
-          className="text-sm text-text-main leading-snug cursor-pointer"
-        >
+        <span className="text-sm text-text-main leading-snug">
           Li e aceito os{' '}
           <a
             href="/termos"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className={LINK}
           >
             Termos de Uso<span className="sr-only"> (abre em nova aba)</span>
@@ -53,14 +54,15 @@ export function TermsConsent({
             href="/privacidade"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className={LINK}
           >
             Política de Privacidade
             <span className="sr-only"> (abre em nova aba)</span>
           </a>
           .
-        </label>
-      </div>
+        </span>
+      </label>
       {error && (
         <p id={errorId} className="text-xs text-red-700 dark:text-red-300 pl-8">
           {error}

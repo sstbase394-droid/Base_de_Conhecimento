@@ -133,7 +133,9 @@ function ClientLayoutContent({
     />
   );
 
-  const commandPalette = isCommandPaletteOpen && (
+  // A CommandPalette só é instanciada para usuários autenticados ou na área logada,
+  // impedindo o download do catálogo de artigos por visitantes na landing page
+  const commandPalette = isCommandPaletteOpen && (!showInstitutionalNavbar || isAuthenticated) && (
     <Suspense fallback={null}>
       <CommandPalette
         isOpen={isCommandPaletteOpen}
