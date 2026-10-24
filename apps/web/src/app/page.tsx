@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   Search,
@@ -218,9 +219,18 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Card 1 */}
-          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between overflow-hidden">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+              <div className="relative w-full h-40 mb-6 rounded-xl overflow-hidden border border-border/60 bg-bg-main/50">
+                <Image
+                  src="/images/institutional/analise-metricas-indicadores.webp"
+                  alt="Painel de indicadores de conformidade e busca de dados"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-4">
                 <Search size={20} />
               </div>
               <h3 className="text-xl font-serif font-semibold text-text-main">Busca Instantânea Inteligente</h3>
@@ -234,9 +244,18 @@ export default function HomePage() {
           </div>
 
           {/* Card 2 */}
-          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between overflow-hidden">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+              <div className="relative w-full h-40 mb-6 rounded-xl overflow-hidden border border-border/60 bg-bg-main/50">
+                <Image
+                  src="/images/institutional/reuniao-corporativa-alinhamento.webp"
+                  alt="Alinhamento corporativo e personalização de marca"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-4">
                 <Palette size={20} />
               </div>
               <h3 className="text-xl font-serif font-semibold text-text-main">Personalização White-Label</h3>
@@ -250,9 +269,18 @@ export default function HomePage() {
           </div>
 
           {/* Card 3 */}
-          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between overflow-hidden">
             <div>
-              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+              <div className="relative w-full h-40 mb-6 rounded-xl overflow-hidden border border-border/60 bg-bg-main/50">
+                <Image
+                  src="/images/institutional/inspecao-seguranca-trabalho.webp"
+                  alt="Inspeção de segurança e conformidade técnica no trabalho"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-4">
                 <SlidersHorizontal size={20} />
               </div>
               <h3 className="text-xl font-serif font-semibold text-text-main">Acessibilidade & Modo Zen</h3>

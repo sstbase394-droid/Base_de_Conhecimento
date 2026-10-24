@@ -109,8 +109,15 @@ function ClientLayoutContent({
     return () => mm.revert();
   }, [pathname]);
 
-  // Determina se a rota atual é pública/institucional
-  const isInstitutionalRoute = pathname === '/' || pathname === '/sobre';
+  // Determina se a rota atual é pública/institucional ou de fluxo de autenticação pública
+  const isAuthRoute =
+    pathname === '/login' ||
+    pathname === '/cadastro' ||
+    pathname === '/cadastro/social' ||
+    pathname === '/esqueci-senha' ||
+    pathname === '/redefinir-senha' ||
+    pathname === '/verificar-email';
+  const isInstitutionalRoute = pathname === '/' || pathname === '/sobre' || isAuthRoute;
   const isAuthenticated = Boolean(session && session.authenticated);
   const showInstitutionalNavbar = isInstitutionalRoute && !isAuthenticated;
 

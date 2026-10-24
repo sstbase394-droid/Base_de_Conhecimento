@@ -131,7 +131,7 @@ export function LoginForm({
                     <SocialLoginButtons next={next} mode="login" />
                     <form onSubmit={handleLogin} className="space-y-4">
                         {error && (
-                            <div role="alert" data-tone="danger" className="ui-alert justify-center">
+                            <div id="login-error-msg" role="alert" data-tone="danger" className="ui-alert justify-center">
                                 {error}
                             </div>
                         )}
@@ -145,6 +145,8 @@ export function LoginForm({
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                aria-invalid={Boolean(error)}
+                                aria-describedby={error ? "login-error-msg" : undefined}
                                 className="ui-input"
                             />
                         </div>
@@ -158,6 +160,8 @@ export function LoginForm({
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                aria-invalid={Boolean(error)}
+                                aria-describedby={error ? "login-error-msg" : undefined}
                                 className="ui-input"
                             />
                             <div className="flex justify-end pt-1">
