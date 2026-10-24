@@ -1,283 +1,414 @@
-import React from 'react';
-import type { Metadata } from 'next';
+'use client';
+
+import React, { useRef } from 'react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import {
   ArrowRight,
   Search,
-  Sparkles,
   Layers,
-  Award,
   CheckCircle2,
   Lock,
-  BookmarkCheck,
   SlidersHorizontal,
   ChevronRight,
+  Palette,
+  ShieldCheck,
+  Terminal,
 } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { ButtonLink } from '@/components/ui/Button';
 import { FAQ_DATA } from '@/features/articles/catalog';
 import { Category } from '@/features/articles/types';
-import {
-  AUDIENCE,
-  MAINTAINERS,
-} from '@/features/sobre/about-content';
+import { MAINTAINERS } from '@/features/sobre/about-content';
 import { MaintainerProfile } from '@/features/sobre/components/People';
 
-export const metadata: Metadata = {
-  title: 'Base SST | Plataforma Inteligente de Segurança do Trabalho e eSocial',
-  description:
-    'A plataforma definitiva de conhecimento, procedimentos práticos e conformidade legal em SST e eSocial para empresas e profissionais.',
-};
+// Carregamento sob demanda do 3D contido estritamente em uma vitrine proporcional
+const Interactive3DHero = dynamic(
+  () => import('@/components/3d/Interactive3DHero').then((m) => m.Interactive3DHero),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center opacity-30">
+        <div className="w-12 h-12 rounded-full border-2 border-dashed border-text-muted animate-spin" />
+      </div>
+    ),
+  }
+);
 
-// Dados dinâmicos do acervo
+// Dados dinâmicos do catálogo de referência
 const ARTICLES = FAQ_DATA.filter((item) => item.category !== Category.SOBRE);
 const TOTAL_ARTICLES = ARTICLES.length;
 const MODULES = Object.values(Category).filter((c) => c !== Category.SOBRE);
 
 export default function HomePage() {
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.registerPlugin(ScrollTrigger);
+
+      const mm = gsap.matchMedia();
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        const revealElements = gsap.utils.toArray<HTMLElement>('.editorial-card');
+        revealElements.forEach((el) => {
+          gsap.fromTo(
+            el,
+            { opacity: 0, y: 24 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 88%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        });
+      });
+
+      return () => mm.revert();
+    },
+    { scope: mainRef }
+  );
+
   return (
-    <div className="w-full flex flex-col gap-24 sm:gap-32 py-4 sm:py-8">
-      {/* ── 1. Hero Section (Design SaaS Moderno) ────────────────────────── */}
-      <section className="relative flex flex-col items-center text-center max-w-4xl mx-auto px-4 pt-6 sm:pt-12">
-        {/* Badge de Destaque */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-border bg-bg-island text-xs font-medium text-text-muted mb-6 shadow-xs animate-fade-in-up">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Plataforma Oficial de Conhecimento eSocial & NRs</span>
+    <div ref={mainRef} className="w-full flex flex-col gap-24 sm:gap-32 py-6 max-w-6xl mx-auto">
+      {/* ── 1. HERO SECTION (Layout Editorial Inspirado na Northline Atelier / Oura) ── */}
+      <section id="visao-geral" className="w-full pt-4 sm:pt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Lado Esquerdo: Tipografia Editorial Pura e Firme */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            <span className="text-xs font-mono uppercase tracking-widest text-text-muted mb-4 border-b border-border/80 pb-1">
+              Plataforma SaaS de Central de Conhecimento
+            </span>
+
+            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight text-text-main leading-[1.1]">
+              Reduza chamados e dê autonomia aos seus clientes.
+            </h1>
+
+            <p className="mt-6 text-base sm:text-lg text-text-muted font-light leading-relaxed max-w-xl">
+              Crie, personalize e publique bases de conhecimento corporativas. Busca instantânea tolerante a erros, design refinado e leitura limpa em um único ambiente.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <ButtonLink
+                href="/artigos"
+                variant="primary"
+                className="!rounded-full px-7 py-3 text-sm font-semibold shadow-sm group"
+              >
+                <span>Ver Demonstração Ao Vivo</span>
+                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </ButtonLink>
+              <ButtonLink
+                href="/cadastro?next=/artigos"
+                variant="secondary"
+                className="!rounded-full px-7 py-3 text-sm font-medium"
+              >
+                <span>Criar Conta Gratuita</span>
+              </ButtonLink>
+            </div>
+          </div>
+
+          {/* Lado Direito: Caixa Gráfica Contida com Objeto 3D Delimitado */}
+          <div className="lg:col-span-5 w-full">
+            <div className="relative aspect-4/3 sm:aspect-square w-full rounded-2xl border border-border bg-bg-island overflow-hidden shadow-xs flex items-center justify-center">
+              {/* O objeto 3D agora vive dentro da moldura editorial, sem vazar para o fundo */}
+              <Interactive3DHero className="w-full h-full" />
+              <div className="absolute bottom-3 right-4 text-[10px] font-mono text-text-muted uppercase tracking-widest pointer-events-none">
+                WebGL 360º Scrubbing
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Título Principal */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif font-bold tracking-tight text-text-main leading-[1.08]">
-          Segurança do Trabalho e eSocial com clareza absoluta.
-        </h1>
-
-        {/* Subtítulo */}
-        <p className="mt-6 text-lg sm:text-xl text-text-muted max-w-2xl font-light leading-relaxed">
-          Centralize orientações técnicas, tabelas normativas, eventos do eSocial e rotinas práticas em uma experiência intuitiva desenvolvida para profissionais de alto nível.
-        </p>
-
-        {/* Botões de Ação (CTAs) */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4 w-full sm:w-auto">
-          <ButtonLink
-            href="/login?next=/artigos"
-            variant="primary"
-            className="!rounded-full px-8 py-3.5 text-base font-semibold shadow-md group"
-          >
-            <span>Acessar Plataforma</span>
-            <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-          </ButtonLink>
-          <ButtonLink
-            href="/cadastro?next=/artigos"
-            variant="secondary"
-            className="!rounded-full px-8 py-3.5 text-base font-medium"
-          >
-            <span>Criar Conta Gratuita</span>
-          </ButtonLink>
-        </div>
-
-        {/* Métricas Rápidas */}
-        <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-12 border-y border-border/60 py-6 w-full max-w-3xl">
-          <div>
-            <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">{TOTAL_ARTICLES}+</p>
-            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Artigos & Guias</p>
+        {/* Barra de Métricas Editoriais (Estilo Linha Northline Atelier) */}
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 border-y border-border py-6 divide-y md:divide-y-0 md:divide-x divide-border">
+          <div className="px-4 py-3 md:py-0 text-center">
+            <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">-70%</p>
+            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Chamados Repetitivos</p>
           </div>
-          <div>
-            <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">{MODULES.length}</p>
-            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Módulos Especializados</p>
+          <div className="px-4 py-3 md:py-0 text-center">
+            <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">&lt; 100ms</p>
+            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Busca Instantânea</p>
           </div>
-          <div>
+          <div className="px-4 py-3 md:py-0 text-center">
             <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">100%</p>
-            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Conformidade Legal</p>
+            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Conformidade LGPD</p>
           </div>
-          <div>
+          <div className="px-4 py-3 md:py-0 text-center">
             <p className="text-3xl sm:text-4xl font-serif font-bold text-text-main">24/7</p>
-            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Disponibilidade</p>
+            <p className="text-xs uppercase tracking-wider text-text-muted mt-1 font-mono">Autoatendimento Ativo</p>
           </div>
         </div>
       </section>
 
-      {/* ── 2. Módulos Temáticos (Prévia do Conteúdo) ────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="ui-eyebrow">Acervo Técnico</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-serif font-bold text-text-main">
-            Estruturado pelos maiores pilares de SST
-          </h2>
-          <p className="mt-3 text-text-muted">
-            Navegue por tópicos especializados que eliminam dúvidas de enquadramento, leiautes de envio e gestão operacional.
+      {/* ── 2. RECURSOS (Grid Reto, Limpo e Proporcional) ─────────────────── */}
+      <section id="recursos" className="w-full">
+        <div className="mb-12 border-b border-border pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-widest text-text-muted">
+              Engenharia de Produto
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-text-main mt-1">
+              Recursos construídos para clareza e escala
+            </h2>
+          </div>
+          <p className="text-sm text-text-muted max-w-sm">
+            Sem distrações: arquitetura focada em velocidade de recuperação da resposta e segurança de dados.
           </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1 */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+                <Search size={20} />
+              </div>
+              <h3 className="text-xl font-serif font-semibold text-text-main">Busca Instantânea Inteligente</h3>
+              <p className="mt-3 text-sm text-text-muted leading-relaxed">
+                Algoritmo tolerante a pequenas falhas de digitação e acentuação, acessível de qualquer tela via atalho global Ctrl + K.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-border/50 text-xs font-mono text-text-muted">
+              Indexação client-side ultra-rápida
+            </div>
+          </div>
+
+          {/* Card 2 */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+                <Palette size={20} />
+              </div>
+              <h3 className="text-xl font-serif font-semibold text-text-main">Personalização White-Label</h3>
+              <p className="mt-3 text-sm text-text-muted leading-relaxed">
+                Apresente seu conteúdo com sua identidade visual: configure domínio exclusivo, logotipo, paleta e tipografia da sua marca.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-border/50 text-xs font-mono text-text-muted">
+              Domínio personalizado com SSL
+            </div>
+          </div>
+
+          {/* Card 3 */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-border/40 flex items-center justify-center text-text-main mb-5">
+                <SlidersHorizontal size={20} />
+              </div>
+              <h3 className="text-xl font-serif font-semibold text-text-main">Acessibilidade & Modo Zen</h3>
+              <p className="mt-3 text-sm text-text-muted leading-relaxed">
+                Leitura livre de poluição visual, suporte nativo a temas claro/escuro, ajuste tipográfico e compatibilidade total com leitores de tela.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-border/50 text-xs font-mono text-text-muted">
+              Padrão WCAG 2.1 AA
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. DEMONSTRAÇÃO VIVA (Módulos do Acervo) ──────────────────────── */}
+      <section id="demonstracao" className="w-full">
+        <div className="mb-12 border-b border-border pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono uppercase tracking-widest text-text-muted">
+              Demonstração ao Vivo
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-text-main mt-1">
+              Nosso próprio acervo em funcionamento
+            </h2>
+          </div>
+          <ButtonLink href="/artigos" variant="secondary" className="!rounded-full px-5 py-2 text-xs font-semibold shrink-0">
+            <span>Ver Catálogo Completo ({TOTAL_ARTICLES})</span>
+            <ChevronRight size={14} className="ml-1" />
+          </ButtonLink>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {MODULES.map((module) => {
             const count = ARTICLES.filter((a) => a.category === module).length;
             return (
-              <div
+              <Link
                 key={module}
-                className="glass-card p-6 sm:p-8 rounded-[24px] flex flex-col justify-between border border-border/80 hover:border-text-main/30 transition-[border-color,transform] duration-200 hover:-translate-y-1"
+                href={`/artigos?category=${encodeURIComponent(module)}`}
+                className="editorial-card p-6 rounded-2xl border border-border bg-bg-island hover:border-text-main/50 transition-colors flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="p-2.5 rounded-2xl bg-black/5 dark:bg-white/10 text-text-main">
-                      <Layers size={20} />
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="p-2 rounded-xl bg-border/40 text-text-main">
+                      <Layers size={18} />
                     </span>
-                    <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-border/40 text-text-muted">
-                      {count} artigos
-                    </span>
+                    <span className="text-xs font-mono text-text-muted">{count} artigos</span>
                   </div>
-                  <h3 className="text-xl font-serif font-semibold text-text-main">{module}</h3>
-                  <p className="mt-2 text-sm text-text-muted leading-relaxed">
-                    Orientações detalhadas, fluxos normativos e respostas fundamentadas para as rotinas de {module}.
+                  <h3 className="text-lg font-serif font-semibold text-text-main group-hover:underline">
+                    {module}
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-text-muted leading-relaxed">
+                    Orientações, fluxos normativos e respostas fundamentadas para rotinas de {module}.
                   </p>
                 </div>
-
-                <div className="mt-6 pt-4 border-t border-border/40 flex items-center justify-between text-xs font-semibold text-text-main">
-                  <span>Acesso Exclusivo</span>
-                  <ChevronRight size={16} />
+                <div className="mt-6 pt-3 border-t border-border/40 flex items-center justify-between text-xs font-medium text-text-main">
+                  <span>Explorar módulo</span>
+                  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
       </section>
 
-      {/* ── 3. Recursos & Diferenciais SaaS ──────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 w-full">
-        <div className="glass-card rounded-[32px] p-8 sm:p-14 border border-border">
-          <div className="max-w-2xl mb-12">
-            <p className="ui-eyebrow">Diferenciais do SaaS</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-serif font-bold text-text-main">
-              Construído para leitura rápida, foco e produtividade
-            </h2>
-            <p className="mt-3 text-text-muted">
-              Uma experiência pensada nos mínimos detalhes para não fazer você perder tempo procurando em PDFs imensos.
-            </p>
+      {/* ── 4. PLANOS E PREÇOS ────────────────────────────────────────────── */}
+      <section id="planos" className="w-full">
+        <div className="text-center max-w-xl mx-auto mb-12">
+          <span className="text-xs font-mono uppercase tracking-widest text-text-muted">
+            Transparência
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-serif font-bold text-text-main mt-1">
+            Planos para cada estágio
+          </h2>
+          <p className="mt-2 text-sm text-text-muted">
+            Valores acessíveis para pequenas equipes e suporte completo para implementações corporativas.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {/* Plano Start */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+            <div>
+              <p className="text-xs uppercase font-mono text-text-muted">Essencial</p>
+              <h3 className="text-2xl font-serif font-bold text-text-main mt-1">Start</h3>
+              <p className="mt-2 text-sm text-text-muted leading-relaxed">
+                Ideal para organizar procedimentos básicos com rapidez.
+              </p>
+              <ul className="mt-6 space-y-2.5 text-xs sm:text-sm text-text-muted">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Até 50 procedimentos publicados</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Busca instantânea incluída</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Layout responsivo</span>
+                </li>
+              </ul>
+            </div>
+            <div className="mt-8 pt-4 border-t border-border">
+              <ButtonLink href="/cadastro?next=/artigos" variant="secondary" className="w-full justify-center text-xs">
+                Começar Grátis
+              </ButtonLink>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <Search size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Busca Inteligente & Tolerante</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Encontre o artigo exato mesmo com pequenas falhas de digitação ou buscando por termos técnicos e códigos de eventos.
+          {/* Plano Professional */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border-2 border-text-main bg-bg-island flex flex-col justify-between shadow-sm relative">
+            <span className="absolute -top-3 left-6 px-3 py-0.5 rounded-full bg-text-main text-bg-main text-[11px] font-semibold uppercase tracking-wider">
+              Recomendado
+            </span>
+            <div>
+              <p className="text-xs uppercase font-mono text-text-muted">Escala</p>
+              <h3 className="text-2xl font-serif font-bold text-text-main mt-1">Professional</h3>
+              <p className="mt-2 text-sm text-text-muted leading-relaxed">
+                Para empresas que querem domínio próprio e identidade customizada.
               </p>
+              <ul className="mt-6 space-y-2.5 text-xs sm:text-sm text-text-muted">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Procedimentos ilimitados</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Domínio próprio (ajuda.empresa.com)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Customização visual White-Label</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Múltiplos editores</span>
+                </li>
+              </ul>
             </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <BookmarkCheck size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Minha Lista de Consulta</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Guarde artigos fundamentais na sua lista pessoal para consultar rapidamente durante reuniões ou preenchimento de laudos.
-              </p>
+            <div className="mt-8 pt-4 border-t border-border">
+              <ButtonLink href="/cadastro?next=/artigos" variant="primary" className="w-full justify-center text-xs">
+                Criar Central Pro
+              </ButtonLink>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <SlidersHorizontal size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Tipografia & Acessibilidade</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Ajuste tamanho de texto, espaçamento, modo escuro e ative tipografia especializada para dislexia com um único clique.
+          {/* Plano Enterprise */}
+          <div className="editorial-card p-6 sm:p-8 rounded-2xl border border-border bg-bg-island flex flex-col justify-between">
+            <div>
+              <p className="text-xs uppercase font-mono text-text-muted">Corporativo</p>
+              <h3 className="text-2xl font-serif font-bold text-text-main mt-1">Enterprise</h3>
+              <p className="mt-2 text-sm text-text-muted leading-relaxed">
+                Para quem exige migração de dados assistida e suporte prioritário.
               </p>
+              <ul className="mt-6 space-y-2.5 text-xs sm:text-sm text-text-muted">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Tudo do plano Professional</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>Migração assistida de conteúdo</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-text-main shrink-0" />
+                  <span>SSO corporativo (SAML/OAuth)</span>
+                </li>
+              </ul>
             </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <Lock size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Segurança Enterprise</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Autenticação assimétrica EdDSA (Ed25519), cookies protegidos contra CSRF/XSS e isolamento completo de sessões.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <Sparkles size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Ambiente Zen Livre de Ruído</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Ative o modo Zen para focar 100% na interpretação da norma, ocultando barras e menus laterais durante leituras longas.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-black/5 dark:bg-white/10 flex items-center justify-center text-text-main">
-                <Award size={22} />
-              </div>
-              <h3 className="text-lg font-semibold text-text-main">Revisão Contínua</h3>
-              <p className="text-sm text-text-muted leading-relaxed">
-                Orientações atualizadas segundo as mais recentes portarias do MTE e do Conselho Curador do FGTS/eSocial.
-              </p>
+            <div className="mt-8 pt-4 border-t border-border">
+              <ButtonLink href="/sobre#contato" variant="secondary" className="w-full justify-center text-xs">
+                Falar com Especialistas
+              </ButtonLink>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4. Público-Alvo ──────────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 w-full">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-10">
-          <div>
-            <p className="ui-eyebrow">A Quem Se Destina</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-serif font-bold text-text-main">
-              Feito para quem decide e opera
-            </h2>
-          </div>
-          <p className="text-sm text-text-muted max-w-md">
-            Atendemos os setores que precisam de precisão documental para evitar passivos trabalhistas e multas fiscais.
-          </p>
+      {/* ── 5. EQUIPE & ENGENHARIA ────────────────────────────────────────── */}
+      <section className="w-full border-t border-border pt-12">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <span className="text-xs font-mono uppercase tracking-widest text-text-muted">
+            Equipe Responsável
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-text-main mt-1">
+            Quem Desenvolveu
+          </h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {AUDIENCE.map((item) => (
-            <div
-              key={item}
-              className="p-5 rounded-2xl border border-border/70 bg-bg-island flex items-center gap-3 shadow-xs"
-            >
-              <CheckCircle2 size={18} className="text-text-main shrink-0" />
-              <span className="text-sm font-medium text-text-body">{item}</span>
-            </div>
+        <div className="space-y-10">
+          {MAINTAINERS.map((maintainer, index) => (
+            <MaintainerProfile key={maintainer.name} person={maintainer} reverse={index % 2 === 1} />
           ))}
         </div>
       </section>
 
-      {/* ── 5. Quem Somos (Autores & Mantenedores) ────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <p className="ui-eyebrow">Quem Desenvolveu</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-serif font-bold text-text-main">
-            Equipe do Projeto
+      {/* ── 6. CTA FINAL LIMPO ────────────────────────────────────────────── */}
+      <section className="w-full mb-8">
+        <div className="p-8 sm:p-12 rounded-2xl border border-border bg-bg-island text-center max-w-3xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-text-main">
+            Pronto para transformar sua central de conhecimento?
           </h2>
-          <p className="mt-3 text-text-muted">
-            Conheça os idealizadores e desenvolvedores responsáveis pela concepção técnica e arquitetura da Base SST.
+          <p className="mt-3 text-sm text-text-muted max-w-lg mx-auto">
+            Experimente o ambiente completo de leitura e autoatendimento agora mesmo.
           </p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {MAINTAINERS.map((maintainer) => (
-            <MaintainerProfile key={maintainer.name} person={maintainer} />
-          ))}
-        </div>
-      </section>
-
-      {/* ── 6. CTA Final de Conversão ────────────────────────────────────── */}
-      <section className="max-w-4xl mx-auto px-4 text-center w-full mb-8">
-        <div className="glass-card rounded-[36px] p-10 sm:p-16 border border-border relative overflow-hidden">
-          <h2 className="text-3xl sm:text-5xl font-serif font-bold text-text-main leading-tight">
-            Pronto para transformar sua rotina em SST?
-          </h2>
-          <p className="mt-4 text-text-muted max-w-xl mx-auto text-base sm:text-lg">
-            Tenha em mãos o guia definitivo de consultas, eventos e fluxos operacionais agora mesmo.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <ButtonLink
-              href="/login?next=/artigos"
-              variant="primary"
-              className="!rounded-full px-10 py-4 text-base font-semibold shadow-lg group"
-            >
-              <span>Entrar na Plataforma</span>
-              <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+          <div className="mt-6 flex justify-center gap-3">
+            <ButtonLink href="/artigos" variant="primary" className="!rounded-full px-7 py-3 text-sm font-semibold">
+              <span>Acessar Acervo Demonstrativo</span>
+              <ArrowRight size={16} className="ml-2" />
             </ButtonLink>
           </div>
         </div>

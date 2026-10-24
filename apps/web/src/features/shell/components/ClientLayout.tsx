@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense, lazy, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar } from '@/features/navigation/components/Sidebar';
+import { InstitutionalNavbar } from '@/features/navigation/components/InstitutionalNavbar';
 import { Footer } from '@/features/navigation/components/Footer';
 import { useConsent } from '@/features/consent/ConsentContext';
 import { useReadingQueue } from '@/features/reading/use-reading-queue';
@@ -14,6 +15,7 @@ import { Category, FAQItem } from '@/features/articles/types';
 import { useThemePreference } from '../use-theme-preference';
 import { useCommandPaletteShortcuts } from '../use-command-palette-shortcuts';
 import { LiquidGlassEffects } from './LiquidGlassEffects';
+import { SmoothScroll } from './SmoothScroll';
 import { ToastProvider } from '@/components/ui/Toast';
 
 // Lazy loaded components para melhorar o tempo de carregamento inicial
@@ -107,7 +109,18 @@ function ClientLayoutContent({
     return () => mm.revert();
   }, [pathname]);
 
-  const sidebar = (
+  // Determina se a rota atual é pública/institucional
+  const isInstitutionalRoute = pathname === '/' || pathname === '/sobre';
+  const isAuthenticated = Boolean(session && session.authenticated);
+  const showInstitutionalNavbar = isInstitutionalRoute && !isAuthenticated;
+
+  const sidebar = showInstitutionalNavbar ? (
+    <InstitutionalNavbar
+      isDarkMode={isDarkMode}
+      onToggleTheme={toggleDark}
+      isAuthenticated={isAuthenticated}
+    />
+  ) : (
     <Sidebar
       currentCat={effectiveCategory}
       onSelect={handleCategorySelect}
@@ -142,37 +155,39 @@ function ClientLayoutContent({
 
   return (
     <SessionSummaryContext.Provider value={session}>
-      <LiquidGlassEffects />
-      {/* Conteúdo acima do fundo (z-10). */}
-      <div className="relative z-10 flex min-h-screen selection:bg-selection">
-        {sidebar}
-        {commandPalette}
+      <SmoothScroll>
+        <LiquidGlassEffects />
+        {/* Conteúdo acima do fundo (z-10). */}
+        <div className="relative z-10 flex min-h-screen selection:bg-selection">
+          {sidebar}
+          {commandPalette}
 
-        <main
-          className="flex-1 w-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] relative"
-        >
-          <div
-            className={`max-w-[2000px] 4xl:max-w-[2400px] mx-auto w-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
-                        ${
-                          isArticleRoute
-                            ? 'px-4 sm:px-8 md:px-12 2xl:px-16 pt-20 md:pt-24 pb-16'
-                            : `px-5 sm:px-8 2xl:px-16 3xl:px-24 4xl:px-32 max-lg:pt-24 max-lg:pb-12 lg:pt-28 lg:pb-12 2xl:pb-16 3xl:pb-24 ${MAIN_LAYOUT_PADDING_CLASS}`
-                        }
-                    `}
+          <main
+            className="flex-1 w-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] relative overflow-x-hidden"
           >
-            <div ref={containerRef} className="w-full transform-gpu">
-              {children}
+            <div
+              className={`max-w-[2000px] 4xl:max-w-[2400px] mx-auto w-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+                          ${
+                            isArticleRoute
+                              ? 'px-4 sm:px-8 md:px-12 2xl:px-16 pt-20 md:pt-24 pb-16'
+                              : `px-5 sm:px-8 2xl:px-16 3xl:px-24 4xl:px-32 max-lg:pt-24 max-lg:pb-12 lg:pt-28 lg:pb-12 2xl:pb-16 3xl:pb-24 ${MAIN_LAYOUT_PADDING_CLASS}`
+                          }
+                      `}
+            >
+              <div ref={containerRef} className="w-full transform-gpu">
+                {children}
+              </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
 
-      <Footer />
+        <Footer />
 
-      <Suspense fallback={null}>
-        <BackToTopButton />
-        <CookieBanner />
-      </Suspense>
+        <Suspense fallback={null}>
+          <BackToTopButton />
+          <CookieBanner />
+        </Suspense>
+      </SmoothScroll>
     </SessionSummaryContext.Provider>
   );
 }

@@ -7,6 +7,7 @@ import { ArticleHero } from '@/features/articles/components/ArticleHero';
 import { ArticleReader } from '@/features/articles/components/ArticleReader';
 import { ArticleActions } from '@/features/articles/components/ArticleActions';
 import { readingMinutes } from '@/features/articles/article-meta';
+import { requireSession } from '@/features/auth/session';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -51,6 +52,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { id } = await params;
+
+  // Protege o artigo no servidor: exige sessão ativa antes de entregar o conteúdo
+  await requireSession(`/artigo/${id}`, undefined);
+
   const article = getArticleById(id);
 
   if (!article || !article.content) {

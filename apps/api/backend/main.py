@@ -91,7 +91,8 @@ def create_app() -> FastAPI:
     app.include_router(content_router)
     install_openapi(app)
 
-    # Frontend de demonstração, montado por último para não sombrear a API.
-    if FRONTEND_DIR.is_dir():
+    # Frontend de demonstração: montado APENAS em ambiente de desenvolvimento ou teste.
+    # Em produção, a responsabilidade é 100% da aplicação Next.js (apps/web).
+    if settings.ENVIRONMENT != Environment.PRODUCTION and FRONTEND_DIR.is_dir():
         app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
     return app

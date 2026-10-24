@@ -18,7 +18,7 @@ export function useMermaidRenderer(htmlContent: string) {
         mermaid.initialize({
           startOnLoad: false,
           theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
-          securityLevel: 'loose',
+          securityLevel: 'strict',
         });
 
         const nodes = document.querySelectorAll<HTMLElement>('.language-mermaid');
