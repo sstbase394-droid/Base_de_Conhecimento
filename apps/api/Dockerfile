@@ -16,7 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY alembic.ini ./
 COPY migrations ./migrations
 COPY backend ./backend
-COPY frontend ./frontend
 
 USER app
 EXPOSE 8000
