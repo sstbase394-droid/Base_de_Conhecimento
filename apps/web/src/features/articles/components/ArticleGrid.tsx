@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowUpRight, Check, Plus } from 'lucide-react';
 import type { FAQItem } from '@/features/articles/types';
 import { useReadingQueue } from '@/features/reading/use-reading-queue';
+import { GradualBlur } from '@/components/ui/GradualBlur';
 
 interface CardItemProps {
   item: FAQItem;
@@ -99,21 +100,35 @@ export const ArticleGrid = ({
   const { queue, toggleQueue } = useReadingQueue();
 
   return (
-    <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 2xl:grid-cols-3" role="list">
-      {items.map((item, idx) => (
-        <li
-          key={item.id}
-          className="h-full [content-visibility:auto] [contain-intrinsic-size:auto_220px]"
-        >
-          <CardItem
-            item={item}
-            index={idx}
-            onClick={() => onModalStateChange?.(true)}
-            isInQueue={queue.includes(item.id)}
-            onToggleQueue={() => toggleQueue(item.id)}
-          />
-        </li>
-      ))}
-    </ul>
+    <div className="relative">
+      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5 2xl:grid-cols-3" role="list">
+        {items.map((item, idx) => (
+          <li
+            key={item.id}
+            className="h-full [content-visibility:auto] [contain-intrinsic-size:auto_220px]"
+          >
+            <CardItem
+              item={item}
+              index={idx}
+              onClick={() => onModalStateChange?.(true)}
+              isInQueue={queue.includes(item.id)}
+              onToggleQueue={() => toggleQueue(item.id)}
+            />
+          </li>
+        ))}
+      </ul>
+
+      {/* Gradual Blur no topo e no final da grade de cards ao rolar */}
+      <GradualBlur
+        position="bottom"
+        target="page"
+        height="5rem"
+        strength={2}
+        layers={8}
+        curve="linear"
+        exponential
+        autoHide
+      />
+    </div>
   );
 };

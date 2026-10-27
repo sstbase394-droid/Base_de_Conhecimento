@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     if (!isAuthConfigured()) return [];
     const { internalUrl } = parseAuthConfig();
+    if (internalUrl === 'http://localhost:3000' || internalUrl === 'http://127.0.0.1:3000') return [];
     return [
       { source: '/auth/:path*', destination: `${internalUrl}/auth/:path*` },
       // Avaliações, sugestões de correção e comentários (ADR-0015 do AuthService).

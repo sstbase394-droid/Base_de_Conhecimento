@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AuthSplitLayout } from '@/features/auth/components/AuthSplitLayout';
 import Link from 'next/link';
-import { LogIn } from 'lucide-react';
+import { LogIn, Eye, EyeOff } from 'lucide-react';
 import { login, refreshSession, type LoginResult } from '@/features/auth/client';
 import { clearAuthReturn, isAuthReturnLoop, markAuthReturn } from '@/features/auth/return-guard';
 import { hardNavigate } from '@/lib/navigation';
@@ -50,6 +50,7 @@ export function LoginForm({
 }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(initialError ?? '');
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
@@ -152,18 +153,28 @@ export function LoginForm({
                         </div>
                         <div className="space-y-1">
                             <label htmlFor="login-password" className="ui-label">Senha</label>
-                            <input
-                                id="login-password"
-                                ref={passwordRef}
-                                type="password"
-                                autoComplete="current-password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                aria-invalid={Boolean(error)}
-                                aria-describedby={error ? "login-error-msg" : undefined}
-                                className="ui-input"
-                            />
+                            <div className="relative">
+                                <input
+                                    id="login-password"
+                                    ref={passwordRef}
+                                    type={showPassword ? 'text' : 'password'}
+                                    autoComplete="current-password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    aria-invalid={Boolean(error)}
+                                    aria-describedby={error ? "login-error-msg" : undefined}
+                                    className="ui-input pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-text-muted hover:text-text-main transition-colors focus:outline-none"
+                                    aria-label={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                                >
+                                    {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                                </button>
+                            </div>
                             <div className="flex justify-end pt-1">
                                 <Link
                                     href={`/esqueci-senha?${new URLSearchParams({ next })}`}
