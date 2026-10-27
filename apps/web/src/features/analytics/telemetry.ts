@@ -108,10 +108,16 @@ export function reportContentError(
     console.error('🚨 [Content Error / Chunk Failure]:', error, context);
   }
 
-  void loadSentry().then((Sentry) => {
-    Sentry?.captureException(error, {
-      extra: context,
-      tags: { source: 'content-chunk-loader' },
+  void loadSentry()
+    .then((Sentry) => {
+      Sentry?.captureException(error, {
+        extra: context,
+        tags: { source: 'content-chunk-loader' },
+      });
+    })
+    .catch((sentryErr) => {
+      if (!IS_PROD) {
+        console.warn('[telemetry] Falha ao despachar exceção para o Sentry:', sentryErr);
+      }
     });
-  });
 }

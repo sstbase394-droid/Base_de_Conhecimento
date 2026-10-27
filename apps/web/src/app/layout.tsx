@@ -33,6 +33,7 @@ export const metadata: Metadata = {
   description:
     'Guias oficiais, diretrizes e procedimentos consolidados de Saúde e Segurança do Trabalho. Pesquise fluxos, eventos do eSocial e regras de negócio.',
   manifest: '/manifest.json',
+  metadataBase: new URL('https://basesst.com.br'),
   openGraph: {
     title: 'Base de Conhecimento SST',
     description:
@@ -40,12 +41,21 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Base de Conhecimento SST',
     locale: 'pt_BR',
+    images: [
+      {
+        url: '/images/institutional/analise-metricas-indicadores.webp',
+        width: 1200,
+        height: 630,
+        alt: 'Base de Conhecimento SST',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Base de Conhecimento SST',
     description:
       'Respostas diretas e auditadas sobre SST e eSocial, com procedimentos passo a passo.',
+    images: ['/images/institutional/analise-metricas-indicadores.webp'],
   },
 };
 

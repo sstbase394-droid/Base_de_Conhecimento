@@ -69,11 +69,14 @@ export function ArticleReader({
   return (
     <>
       <div
-        aria-hidden="true"
         className="fixed top-0 left-0 right-0 z-[70] h-[2px] no-print pointer-events-none"
       >
         <div
           ref={barRef}
+          role="progressbar"
+          aria-label="Progresso de leitura do artigo"
+          aria-valuemin={0}
+          aria-valuemax={100}
           data-testid="reading-progress"
           className="h-full origin-left bg-text-main"
           style={{ transform: 'scaleX(0)' }}

@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './glass.css';
 @import './ui.css';
+@import './institutional-theme.css';
 
 /* Cache bust Turbopack: monochrome v2 */
 

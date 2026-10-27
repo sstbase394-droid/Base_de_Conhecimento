@@ -21,7 +21,7 @@ const ARTICLE_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption',
   ],
   allowedAttributes: {
-    a: ['href', 'title', 'name'],
+    a: ['href', 'title'],
     img: ['src', 'alt', 'title', 'width', 'height'],
     th: ['align', 'colspan', 'rowspan'],
     td: ['align', 'colspan', 'rowspan'],
@@ -32,6 +32,24 @@ const ARTICLE_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedSchemes: ['http', 'https', 'mailto', 'tel'],
   allowedSchemesByTag: { img: ['http', 'https', 'data'] },
   allowProtocolRelative: false,
+  transformTags: {
+    img: (tagName, attribs) => {
+      // Validação restrita contra XSS via SVG inline em data URIs
+      if (attribs.src && attribs.src.startsWith('data:')) {
+        const isSafeRasterImage = /^data:image\/(png|jpeg|webp|gif);base64,/i.test(attribs.src);
+        if (!isSafeRasterImage) {
+          return {
+            tagName: 'img',
+            attribs: { ...attribs, src: '' },
+          };
+        }
+      }
+      return {
+        tagName,
+        attribs,
+      };
+    },
+  },
 };
 
 export function sanitizeArticleHtml(html: string): string {

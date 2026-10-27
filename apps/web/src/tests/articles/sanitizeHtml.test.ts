@@ -54,4 +54,14 @@ describe('sanitizeArticleHtml (XSS)', () => {
     expect(out).toContain('<mark class="sst-highlight-amber">x</mark>');
     expect(out).toContain('data-tooltip="def"');
   });
+
+  it('bloqueia data URI contendo SVG ou scripts em <img> e atributo name em <a>', () => {
+    const maliciousSvg = 'data:image/svg+xml;utf8,<svg onload=alert(1)></svg>';
+    const outImg = sanitizeArticleHtml(`<img src="${maliciousSvg}">`);
+    expect(outImg).not.toContain('image/svg+xml');
+
+    const outAnchor = sanitizeArticleHtml('<a href="/test" name="testClobber">link</a>');
+    expect(outAnchor).not.toContain('name="testClobber"');
+    expect(outAnchor).toContain('href="/test"');
+  });
 });
